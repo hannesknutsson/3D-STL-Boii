@@ -59,7 +59,7 @@ async def on_message(message):
 			await asyncDownloadFile(url, compositeFilename)
 			newArgs = args
 			
-			frames = 200
+			frames = 150
 			time_to_rotate = 8
 			time_per_frame = time_to_rotate / frames
 

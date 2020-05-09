@@ -1,7 +1,9 @@
-FROM python:3.9.0a6-alpine3.11
+FROM python:3.9.0a6-buster
 
-RUN apk update && apk upgrade
-RUN apk add git 
+RUN apt -y update && apt -y upgrade
+RUN apt -y install git
+
+RUN pip install --upgrade pip
 
 #RUN python -m pip install -U discord.py
 
