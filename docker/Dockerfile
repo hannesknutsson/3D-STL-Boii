@@ -4,6 +4,30 @@ RUN apk update && apk upgrade
 RUN apk add git 
 
 #RUN python -m pip install -U discord.py
+
+RUN echo ""
+RUN echo "mat"
+
+RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+
+RUN echo ""
+RUN echo "nump"
+
+RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+
+RUN echo ""
+RUN echo "stl"
+
+RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+
+RUN echo ""
+RUN echo "ima"
+
+RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+
+RUN echo ""
+RUN echo "disc"
+
 RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
 
 
