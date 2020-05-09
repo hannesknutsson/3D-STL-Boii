@@ -59,8 +59,8 @@ async def on_message(message):
 			await asyncDownloadFile(url, compositeFilename)
 			newArgs = args
 			
-			frames = 100
-			time_to_rotate = 4
+			frames = 200
+			time_to_rotate = 8
 			time_per_frame = time_to_rotate / frames
 
 			newArgs[1] = compositeFilename
@@ -77,10 +77,10 @@ async def on_message(message):
 				StlToGif.main(newArgs)
 				print("Attempting to send: " + compositeFilename + ".gif")
 				await message.channel.send(file=discord.File(compositeFilename + ".gif", filename + ".gif"))
+				shutil.rmtree(id)
 			except:
 				await message.channel.send("Your file do not seem valid :(")
 			await notification_message.delete()
-			shutil.rmtree(id)
 
 @client.event
 async def on_ready():

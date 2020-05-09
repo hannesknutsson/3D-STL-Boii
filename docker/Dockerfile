@@ -8,27 +8,27 @@ RUN apk add git
 RUN echo ""
 RUN echo "mat"
 
-RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+RUN pip install Matplotlib
 
 RUN echo ""
 RUN echo "nump"
 
-RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+RUN pip install Numpy
 
 RUN echo ""
 RUN echo "stl"
 
-RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+RUN pip install Numpy-stl
 
 RUN echo ""
 RUN echo "ima"
 
-RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+RUN pip install imageio
 
 RUN echo ""
 RUN echo "disc"
 
-RUN pip install Matplotlib Numpy Numpy-stl imageio discord.py
+RUN pip install discord.py
 
 
 RUN git clone https://github.com/hannesknutsson/3D-STL-Boii.git
