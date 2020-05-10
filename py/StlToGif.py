@@ -120,7 +120,6 @@ def createFrames():
 	
 		# Save frame
 		frame_i = "frame_" + str(i)
-		print("Saved frames: " + str(i+1) + "/" + str(frames))
 		plt.savefig(path + frame_i + ".png")
 
 # Loads frames and creates gif
