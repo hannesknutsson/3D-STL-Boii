@@ -192,7 +192,7 @@ def main(argv):
 			inputfile = arg        
 			
 		elif opt in ("-o", "--ofile"):
-			outputfile = arg + ".gif"
+			outputfile = arg
 
 		elif opt in ("-p", "--path"):
 			path = arg       

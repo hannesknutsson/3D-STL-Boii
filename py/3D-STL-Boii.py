@@ -7,86 +7,108 @@ import urllib
 import asyncio
 import aiohttp
 import os
-
-from concurrent.futures import ThreadPoolExecutor
+import logging
 
 TOKEN = sys.argv[1]
-
-args = ["-i", "replacethis", "-o", "replacethis", "--elevation", "45", "--duration", "replacethis", "--nframes", "replacethis"]
-
 client = discord.Client()
 
-async def asyncDownloadFile(URL, destinationFile):
+#Just some function to retrieve the attachment
+async def async_download_file(url, destinationFile):
 	async with aiohttp.ClientSession() as session:
-		async with session.get(URL) as response:
-			print("Starting async download call")
+		async with session.get(url) as response:
 			if response.status == 200:
 				data = await response.read()
-
-				print("Response is 200")
-
 				file = open(destinationFile, 'wb')
 				file.write(data)
 				file.close()
 
-				print("File written")
+#Compiles appropriate arguments for the gif rendering script
+def get_render_args(input_file, output_file, time_per_frame, number_of_frames, frames_location):
+	newArgs = []
+	newArgs.append("-i")
+	newArgs.append(input_file)
+	newArgs.append("-o")
+	newArgs.append(output_file)
+	newArgs.append("--elevation")
+	newArgs.append("45")
+	newArgs.append("--duration")
+	newArgs.append(str(time_per_frame))
+	newArgs.append("--nframes")
+	newArgs.append(str(number_of_frames))
+	newArgs.append("--path")
+	newArgs.append(frames_location)
+	return newArgs
 
 @client.event
 async def on_message(message):
+
+	#Don't respond to bots
 	if message.author == client.user:
 		return
 
+	#Don't respond if there are no attachments
 	if not message.attachments:
 		return
 
 	for attachment in message.attachments:
 
-		filename = attachment.filename
+		#We don't even try rendering non STL files
+		if attachment.filename.lower().endswith(".stl"):
 
-		print(filename)
-
-		if filename.lower().endswith(".stl"):
-			
-			response = "Looks like a .stl file! I'll attempt to render it :)"
-			
+			#Generic vars
 			url = attachment.url
-			id = str(attachment.id)
+			render_id = str(attachment.id)
+			original_filename = attachment.filename
+			stl_file_location = render_id + os.sep + original_filename
 
-			os.mkdir(id)
-
-			compositeFilename = id + os.sep + filename
-
-			await asyncDownloadFile(url, compositeFilename)
-			newArgs = args
-			
-			frames = 150
+			#Render tweaks
+			number_of_frames = 150
 			time_to_rotate = 8
-			time_per_frame = time_to_rotate / frames
 
-			newArgs[1] = compositeFilename
-			newArgs[3] = compositeFilename
-			newArgs[7] = time_per_frame
-			newArgs[9] = frames
+			#Create attachment specific directory
+			os.mkdir(render_id)
 
-			newArgs.append("--path")
-			newArgs.append(id + os.sep + "frames" + os.sep)
+			#Retrieve model
+			await async_download_file(url, stl_file_location)
 
+			#Begin render
 			notification_message = await message.channel.send("Work work work...")
-
 			try:
-				StlToGif.main(newArgs)
-				print("Attempting to send: " + compositeFilename + ".gif")
-				await message.channel.send(file=discord.File(compositeFilename + ".gif", filename + ".gif"))
-				shutil.rmtree(id)
+				rendered_gif = render_stl_attachment(stl_file_location, render_id, number_of_frames, time_to_rotate)
+				print("Attempting to send: " + rendered_gif)
+				await message.channel.send(file=discord.File(rendered_gif, original_filename + ".gif"))
+
+				#Clean up
+				shutil.rmtree(render_id)
 			except:
-				await message.channel.send("Your file do not seem valid :(")
+				logging.exception("message")
+				#Sad noises to user
+				await message.channel.send("Your file does not seem valid :(")
+
+			#Remove the notification
 			await notification_message.delete()
+
+#Renders a gif and returns the location of the gif
+def render_stl_attachment(stl_file, render_id, number_of_frames, time_to_rotate):
+		
+		#Calculate render specific parameters
+		time_per_frame = time_to_rotate / number_of_frames
+		frames_location = render_id + os.sep + "frames" + os.sep
+		render_filename = render_id + os.sep + "render.gif"
+
+		#Get attachment specific render parameters
+		render_args = get_render_args(stl_file, render_filename, time_per_frame, number_of_frames, frames_location)
+
+		#Do the thing
+		StlToGif.main(render_args)
+		
+		return render_filename
 
 @client.event
 async def on_ready():
 	print('Logged in as')
 	print(client.user.name)
 	print(client.user.id)
-	print('------')
+	print('----------------------------------')
 
 client.run(TOKEN)
