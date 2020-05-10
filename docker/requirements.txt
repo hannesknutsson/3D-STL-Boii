@@ -1,0 +1,6 @@
+install
+Matplotlib
+Numpy
+Numpy-stl
+imageio
+discord.py
