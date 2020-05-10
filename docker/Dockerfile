@@ -8,6 +8,6 @@ ADD py/3D-STL-Boii.py .
 ADD docker/requirements.txt .
 
 RUN pip install --upgrade pip
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
 
 ENTRYPOINT ["python", "3D-STL-Boii.py"]
