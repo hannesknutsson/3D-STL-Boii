@@ -1,4 +1,3 @@
-install
 Matplotlib
 Numpy
 Numpy-stl
