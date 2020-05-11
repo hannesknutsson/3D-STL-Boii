@@ -23,30 +23,31 @@ async def on_message(message):
 	#Don't respond if there are no attachments
 	if not message.attachments:
 		return
+		
+	#Make sure there is a gif cache directory
+	gif_cache_dir = "gif_cache"
+	make_chache_dir_if_not_present(gif_cache_dir)
 
+	#Just in case there are multiple attachments
 	for attachment in message.attachments:
 
 		#We don't even try rendering non STL files
 		if attachment.filename.lower().endswith(".stl"):
 
-			#Make sure there is a gif cache directory
-			gif_cache_dir = "gif_cache"
-			try:
-				os.mkdir(gif_cache_dir)
-			except:
-				pass
 
-			#Begin working
-			notification_message = await message.channel.send("Work work...")
-			try:
-				gif = await get_gif(attachment, gif_cache_dir)
-				#Finish the job
-				print("Attempting to send: " + gif)
-				await message.channel.send(file=discord.File(gif, attachment.filename + ".gif"))
-			except:
-				#Sad noises to user
-				await message.channel.send("Something went wrong while processing your file :(")
-				logging.exception("message")
+			#Do the work nessecary
+			await handle_attachment(attachment, message, gif_cache_dir)
+
+#Handles the attachment, duh
+async def handle_attachment(attachment, message, gif_cache_dir):
+	notification_message = await message.channel.send("Work work...")
+	try:
+		gif = await get_gif(attachment, gif_cache_dir)
+		await message.channel.send(file=discord.File(gif, attachment.filename + ".gif"), content="Here is a render of **" + attachment.filename + "** uploaded by " + message.author.mention + ". Neat! :camera_with_flash:")
+		await notification_message.delete()
+	except:
+		await notification_message.edit(content="Hey, " + message.author.mention + "! I'm sad to tell you that I failed to render **" + attachment.filename + "** for you :sob:")
+		logging.exception("message")
 
 #Gets a gif from the specified attachment, will never render the same attachment twice
 async def get_gif(attachment, gif_cache_dir):
@@ -155,6 +156,13 @@ async def async_download_file(url, destinationFile):
 				file = open(destinationFile, 'wb')
 				file.write(data)
 				file.close()
+
+#Just hiding away the exception handling in a pretty method
+def make_chache_dir_if_not_present(cache_dir):
+	try:
+		os.mkdir(cache_dir)
+	except:
+		pass
 
 @client.event
 async def on_ready():
